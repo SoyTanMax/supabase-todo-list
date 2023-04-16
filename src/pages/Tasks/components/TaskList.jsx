@@ -1,44 +1,31 @@
 import { useSupabase } from '@/hooks'
 import { useState, useEffect } from 'react'
 import { loadingStates, supabaseMethods } from '@/constants'
-import supabase from '../../../supabase'
+import supabase from '@/supabase'
+import Task from './Task';
 
 export default function TaskList(){
     const [tasks, setTasks] = useState([]);
-
-    // const { run, data, error, loading} = useSupabase(null)
-
-    // async function handleDelete(id){
-    //     await run('todos', supabaseMethods.DELETE, { id })
-    // }
-
-    // useEffect(() => {
-    //     async function fetchTasks(){
-    //         await run('todos', supabaseMethods.SELECT)
-    //     }
-    //     fetchTasks()
-    // },[])
-
-    // useEffect(() => {
-    //     if(data){
-    //         setTasks(data)
-    //     }
-    // },[data])
+    const [loadingState, setLoadingState] = useState(loadingStates.IDLE);
 
     async function getTasks(){
         const response = await supabase.from('todos').select();
         setTasks(response.data);
     }
 
+    async function handleDelete(id){
+        const response = await supabase.from('todos').delete().eq('id', id);
+        const newTasks = tasks.filter(task => task.id !== id);
+        setTasks(newTasks);
+    }
+
+    async function handleEdit(id){
+        return 
+    }
+
     useEffect(() => {
         getTasks();
     },[])
-
-    // if(loading === loadingStates.PENDING){
-    //     return (
-    //         <p className='text-center text-2xl font-bold text-white py-12'>Loading tasks...</p>
-    //     )
-    // }
     
     if(!tasks.length){
         return (
@@ -49,10 +36,12 @@ export default function TaskList(){
     return (
         <ul className="py-12">
             {tasks.map((task) =>(
-                <li key={task.id} className='flex gap-4 items-center justify-center py-2'>
-                    <p>{task.text}</p>
-                    <button className='p-2' onClick={() => handleDelete(task.id)}>delete</button>
-                </li>
+                <Task 
+                    key={task.id} 
+                    text={task.text} 
+                    onDelete={() => handleDelete(task.id)}
+                    onEdit={() => handleEdit(task.id)}
+                />
             ))}
         </ul>
     )

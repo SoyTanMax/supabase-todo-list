@@ -1,3 +1,4 @@
+import { Toast } from '../components'
 import { AddTask, TaskList, ClearTasks } from './Tasks/components'
 
 export default function Home(){
